@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Environment Variables & Secrets (JANGAN DI-PUSH KE GITHUB)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System & Editor
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary test artifacts
+public/images/test_*.jpg
+public/images/test_*.png
+public/images/dashboard_*.png

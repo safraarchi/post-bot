@@ -1,0 +1,350 @@
+[
+  {
+    "id": "s7SawitReceiver01",
+    "name": "03_Sawit_Content_Receiver_Webhook",
+    "active": true,
+    "nodes": [
+      {
+        "parameters": {
+          "content": "### 📥 1. Webhook Penerima Konten\nMenerima kiriman batch konten dari script lokal (`generate_sawit_content.js`) via HTTP POST.\nEndpoint URL: `http://localhost:5678/webhook/enqueue-sawit-content`",
+          "height": 260,
+          "width": 300,
+          "color": 4
+        },
+        "id": "wh-note-01",
+        "name": "Note 1: Webhook",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          180,
+          180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### ⚙️ 2. Konfigurasi Google Sheets\nTarget Spreadsheet ID dan nama tab 'ContentQueue'.",
+          "height": 260,
+          "width": 260,
+          "color": 6
+        },
+        "id": "wh-note-02",
+        "name": "Note 2: Config",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          520,
+          180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 🔄 3. Normalisasi Data\nMemvalidasi dan membongkar array batch kiriman menjadi baris-baris antrean terpisah dengan status default 'READY'.",
+          "height": 260,
+          "width": 320,
+          "color": 2
+        },
+        "id": "wh-note-03",
+        "name": "Note 3: Normalize",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          820,
+          180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 📊 4. Append ke Google Sheets\nMenambahkan baris antrean baru ke Google Sheets menggunakan kredensial yang sudah terhubung.",
+          "height": 260,
+          "width": 360,
+          "color": 5
+        },
+        "id": "wh-note-04",
+        "name": "Note 4: Append Sheets",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          180
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "enqueue-sawit-content",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "3a9d1a20-3b4c-4d5e-8f6a-334455667701",
+        "name": "Webhook Konten Sawit",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          220,
+          480
+        ],
+        "webhookId": "enqueue-sawit-content"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wh-cfg-1",
+                "name": "google_sheet_id",
+                "value": "16-6Y49K77YOD17V6eaqk0IdvVRyRP4K7hcxqQf-s3WQ",
+                "type": "string"
+              },
+              {
+                "id": "wh-cfg-2",
+                "name": "sheet_name",
+                "value": "ContentQueue",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "3a9d1a20-3b4c-4d5e-8f6a-334455667702",
+        "name": "Set Config Spreadsheet",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          560,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Normalisasi payload batch dari Webhook\nconst raw = $('Webhook Konten Sawit').first().json || {};\nconst body = raw.body ? raw.body : raw;\nconst items = Array.isArray(body.items) ? body.items : (Array.isArray(body) ? body : [body]);\n\nconst formattedItems = [];\nfor (let i = 0; i < items.length; i++) {\n  const row = items[i];\n  if (!row || (!row.topic_or_prompt && !row.generated_caption)) continue;\n  \n  formattedItems.push({\n    json: {\n      id: row.id || `SSN-${Date.now()}-${i + 1}`,\n      topic_or_prompt: row.topic_or_prompt || '',\n      post_type: (row.post_type || 'TEXT').toString().trim().toUpperCase(),\n      scheduled_time: row.scheduled_time || '',\n      generated_caption: row.generated_caption || '',\n      media_url: row.media_url || '',\n      link_url: row.link_url || '',\n      status: (row.status || 'READY').toString().trim().toUpperCase(),\n      fb_post_id: '',\n      fb_post_url: '',\n      error_log: ''\n    }\n  });\n}\n\nreturn formattedItems;"
+        },
+        "id": "3a9d1a20-3b4c-4d5e-8f6a-334455667703",
+        "name": "Normalisasi Baris Konten",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "16-6Y49K77YOD17V6eaqk0IdvVRyRP4K7hcxqQf-s3WQ",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "ContentQueue",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id": "={{ $json.id }}",
+              "topic_or_prompt": "={{ $json.topic_or_prompt }}",
+              "post_type": "={{ $json.post_type }}",
+              "scheduled_time": "={{ $json.scheduled_time }}",
+              "generated_caption": "={{ $json.generated_caption }}",
+              "media_url": "={{ $json.media_url }}",
+              "link_url": "={{ $json.link_url }}",
+              "status": "={{ $json.status }}",
+              "fb_post_id": "={{ $json.fb_post_id }}",
+              "fb_post_url": "={{ $json.fb_post_url }}",
+              "error_log": "={{ $json.error_log }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "topic_or_prompt",
+                "displayName": "topic_or_prompt",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "post_type",
+                "displayName": "post_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "scheduled_time",
+                "displayName": "scheduled_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "generated_caption",
+                "displayName": "generated_caption",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "media_url",
+                "displayName": "media_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "link_url",
+                "displayName": "link_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "fb_post_id",
+                "displayName": "fb_post_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "fb_post_url",
+                "displayName": "fb_post_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "error_log",
+                "displayName": "error_log",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "3a9d1a20-3b4c-4d5e-8f6a-334455667704",
+        "name": "Append ke Google Sheets",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1220,
+          480
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "8zUZsfPdlq7P4Tbc",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={\n  \"success\": true,\n  \"inserted_count\": {{ $('Normalisasi Baris Konten').all().length }},\n  \"timestamp\": \"{{ $now.toISO() }}\",\n  \"message\": \"Berhasil memasukkan baris antrean konten Solusi Sawit Nusantara ke Google Sheets!\"\n}",
+          "options": {}
+        },
+        "id": "3a9d1a20-3b4c-4d5e-8f6a-334455667705",
+        "name": "Kirim Respon Sukses",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          1520,
+          480
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook Konten Sawit": {
+        "main": [
+          [
+            {
+              "node": "Set Config Spreadsheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Config Spreadsheet": {
+        "main": [
+          [
+            {
+              "node": "Normalisasi Baris Konten",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalisasi Baris Konten": {
+        "main": [
+          [
+            {
+              "node": "Append ke Google Sheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append ke Google Sheets": {
+        "main": [
+          [
+            {
+              "node": "Kirim Respon Sukses",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    }
+  }
+]

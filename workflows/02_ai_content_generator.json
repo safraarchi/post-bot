@@ -1,0 +1,297 @@
+{
+  "name": "02_AI_Content_Generator_PRO",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### 🎯 1. Pemicu AI Generator\nJalankan workflow ini saat Anda ingin AI otomatis membuatkan draf caption lengkap dari baris Google Sheets yang berstatus 'GENERATE_AI'.",
+        "height": 260,
+        "width": 260,
+        "color": 4
+      },
+      "id": "ai-note-01",
+      "name": "Note 1: Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### ⚙️ 2. Konfigurasi AI & Sheets\nMasukkan Gemini API Key Anda di sini (ID Google Sheet Anda sudah terisi otomatis).",
+        "height": 260,
+        "width": 260,
+        "color": 6
+      },
+      "id": "ai-note-02",
+      "name": "Note 2: Config",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 🤖 3. Google Gemini 1.5 Flash\nMengubah topik singkat menjadi caption profesional:\n- Hook pembuka yang memikat\n- Poin isi edukatif/promotif\n- Call To Action (ajakan interaksi)\n- 3-5 hashtag relevan",
+        "height": 260,
+        "width": 480,
+        "color": 2
+      },
+      "id": "ai-note-03",
+      "name": "Note 3: AI Engine",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 📝 4. Simpan ke Google Sheets\nMenyimpan teks caption ke kolom `generated_caption` dan mengubah status baris menjadi 'READY' (siap diterbitkan).",
+        "height": 260,
+        "width": 440,
+        "color": 5
+      },
+      "id": "ai-note-04",
+      "name": "Note 4: Save Result",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        180
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556601",
+      "name": "Manual / On Click Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ai-cfg-1",
+              "name": "gemini_api_key",
+              "value": "PASTE_YOUR_GEMINI_API_KEY_HERE",
+              "type": "string"
+            },
+            {
+              "id": "ai-cfg-2",
+              "name": "google_sheet_id",
+              "value": "16-6Y49K77YOD17V6eaqk0IdvVRyRP4K7hcxqQf-s3WQ",
+              "type": "string"
+            },
+            {
+              "id": "ai-cfg-3",
+              "name": "sheet_name",
+              "value": "ContentQueue",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556602",
+      "name": "Set Config AI & Sheets",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Set Config AI & Sheets').item.json.google_sheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Set Config AI & Sheets').item.json.sheet_name }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556603",
+      "name": "Ambil Draf Ide dari Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        740,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Hanya ambil baris yang statusnya 'GENERATE_AI' dan memiliki topik/prompt\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (row.status === 'GENERATE_AI' && row.topic_or_prompt && row.topic_or_prompt.trim().length > 0) {\n    results.push(item);\n  }\n}\n\nreturn results;"
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556604",
+      "name": "Filter Status GENERATE_AI",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{ $('Set Config AI & Sheets').item.json.gemini_api_key }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Anda adalah seorang copywriter media sosial profesional untuk Facebook Page. Tugas Anda adalah mengubah ide/topik berikut menjadi postingan Facebook yang menarik, interaktif, dan mudah dibaca.\\n\\nTopik: {{ $json.topic_or_prompt }}\\nFormat Postingan: {{ $json.post_type || 'TEXT' }}\\n\\nStruktur postingan wajib mencakup:\\n1. Kalimat pembuka (hook) yang menarik perhatian.\\n2. Isi/penjelasan singkat yang sarat manfaat dengan poin-poin rapi dan emoji yang natural.\\n3. Kalimat ajakan bertindak (Call To Action / CTA) yang memancing komentar atau like.\\n4. 3-5 hashtag relevan di akhir.\\n\\nBahasa: Bahasa Indonesia gaya kasual, santun, dan komunikatif.\\nKeluarkan HANYA teks isi postingan tanpa teks pengantar atau catatan tambahan apa pun.\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556605",
+      "name": "Google Gemini Generate Caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        480
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ekstrak hasil teks dari Gemini API\nconst geminiRes = $input.item.json;\nconst originRow = $('Filter Status GENERATE_AI').item.json;\n\nlet caption = '';\ntry {\n  caption = geminiRes.candidates[0].content.parts[0].text.trim();\n} catch (e) {\n  caption = originRow.topic_or_prompt;\n}\n\nreturn {\n  id: originRow.id,\n  generated_caption: caption,\n  status: 'READY',\n  error_log: geminiRes.error ? geminiRes.error.message : ''\n};"
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556606",
+      "name": "Format Hasil AI",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Set Config AI & Sheets').item.json.google_sheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Set Config AI & Sheets').item.json.sheet_name }}",
+          "mode": "name"
+        },
+        "matchingColumn": "id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "generated_caption": "={{ $json.generated_caption }}",
+            "status": "={{ $json.status }}",
+            "error_log": "={{ $json.error_log }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "2a9d1a20-3b4c-4d5e-8f6a-223344556607",
+      "name": "Simpan Caption ke Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1680,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Manual / On Click Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config AI & Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config AI & Sheets": {
+      "main": [
+        [
+          {
+            "node": "Ambil Draf Ide dari Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Draf Ide dari Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter Status GENERATE_AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Status GENERATE_AI": {
+      "main": [
+        [
+          {
+            "node": "Google Gemini Generate Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Generate Caption": {
+      "main": [
+        [
+          {
+            "node": "Format Hasil AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Hasil AI": {
+      "main": [
+        [
+          {
+            "node": "Simpan Caption ke Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

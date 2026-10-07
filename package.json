@@ -1,0 +1,31 @@
+{
+  "name": "n8n-facebook-autopost",
+  "version": "1.0.0",
+  "description": "Sistem Auto-Posting Facebook Page Terjadwal dan AI Content Generator menggunakan n8n dan Google Sheets",
+  "main": "scripts/test_fb_token.js",
+  "scripts": {
+    "start": "npx n8n",
+    "dashboard": "node scripts/dashboard_server.js",
+    "scheduler": "node scripts/sawit_scheduler.js",
+    "schedule:auto": "node scripts/sawit_scheduler.js --auto",
+    "schedule:list": "node scripts/sawit_scheduler.js --list",
+    "generate-content": "node scripts/generate_sawit_content.js",
+    "generate-content:dry": "node scripts/generate_sawit_content.js --dry-run",
+    "test:token": "node scripts/test_fb_token.js",
+    "token:permanent": "node scripts/get_permanent_token.js"
+  },
+  "keywords": [
+    "n8n",
+    "facebook",
+    "meta-graph-api",
+    "auto-post",
+    "automation",
+    "google-sheets",
+    "gemini"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer-core": "^25.12.0"
+  }
+}

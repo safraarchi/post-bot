@@ -1,0 +1,510 @@
+{
+  "name": "01_Facebook_Page_Auto_Publisher_PRO",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### ⏰ 1. Pemicu Jadwal (Cron)\nWorkflow ini memeriksa Google Sheets secara otomatis setiap 15 menit untuk mencari postingan yang sudah waktunya tayang.",
+        "height": 260,
+        "width": 260,
+        "color": 4
+      },
+      "id": "note-01",
+      "name": "Note 1: Jadwal",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### ⚙️ 2. Kredensial & Pengaturan\nData Halaman **Solusi Sawit Nusantara** dan ID Google Sheet Anda sudah diisikan otomatis di sini.",
+        "height": 260,
+        "width": 260,
+        "color": 6
+      },
+      "id": "note-02",
+      "name": "Note 2: Config",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 📊 3. Ambil & Filter Data\nMengambil baris dari Google Sheets dengan kriteria:\n1. Status = 'READY'\n2. scheduled_time <= Waktu Sekarang",
+        "height": 260,
+        "width": 460,
+        "color": 5
+      },
+      "id": "note-03",
+      "name": "Note 3: Sheets & Filter",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        740,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 🌐 4. Router & Meta Graph API (v21.0)\nMengarahkan tipe postingan:\n- **IMAGE** -> POST /photos (Gambar + Caption)\n- **LINK** -> POST /feed (Link URL + Teks)\n- **TEXT** -> POST /feed (Pesan Teks)",
+        "height": 450,
+        "width": 450,
+        "color": 2
+      },
+      "id": "note-04",
+      "name": "Note 4: Meta Graph API",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### ✅ 5. Update Status & URL Postingan\nSetelah tayang di Facebook:\n- Mengubah status menjadi 'PUBLISHED'\n- Mencatat tautan langsung postingan ke Google Sheets\n- Mencatat pesan error jika ada kendala",
+        "height": 260,
+        "width": 440,
+        "color": 7
+      },
+      "id": "note-05",
+      "name": "Note 5: Response Update",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445501",
+      "name": "Schedule Trigger (Setiap 15 Menit)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cfg-1",
+              "name": "fb_page_id",
+              "value": "1340652705797853",
+              "type": "string"
+            },
+            {
+              "id": "cfg-2",
+              "name": "fb_page_access_token",
+              "value": "EAAO5BE6BfJMBShszkzJSSXhxvHbdGEriYNOHmFOMIETWRsAAvqD59iEQkxh0fKAQBWqQWM8caypdqJjgxLaBJtdQepCnpEnZBhL8XsVONdToNBMZARLdOMzGkS47n8S06HFdCLTXPGGI8o2WVMN2JDvdOW4mJgF08YlWjulnL0kKmrNWW7qFBvh39DOs2tRb0rL7tJ",
+              "type": "string"
+            },
+            {
+              "id": "cfg-3",
+              "name": "google_sheet_id",
+              "value": "16-6Y49K77YOD17V6eaqk0IdvVRyRP4K7hcxqQf-s3WQ",
+              "type": "string"
+            },
+            {
+              "id": "cfg-4",
+              "name": "sheet_name",
+              "value": "ContentQueue",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445502",
+      "name": "Set Config & Credentials",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Set Config & Credentials').item.json.google_sheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Set Config & Credentials').item.json.sheet_name }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445503",
+      "name": "Ambil Data Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Logika Filter Standar Industri Media Sosial:\n// 1. Baris harus berstatus 'READY'\n// 2. Waktu terjadwal (scheduled_time) harus sudah tiba / terlewat dari waktu saat ini\n\nconst now = new Date();\nconst allItems = $input.all();\nconst validItems = [];\n\nfor (const item of allItems) {\n  const row = item.json;\n  const status = (row.status || '').toString().trim().toUpperCase();\n  \n  // Hanya proses baris yang siap diterbitkan\n  if (status !== 'READY') {\n    continue;\n  }\n  \n  const timeStr = row.scheduled_time;\n  if (!timeStr) continue;\n  \n  // Tangani berbagai variasi format tanggal (ISO, spasi, atau timestamp)\n  let scheduledTime = new Date(timeStr);\n  if (isNaN(scheduledTime.getTime())) {\n    scheduledTime = new Date(timeStr.toString().replace(' ', 'T'));\n  }\n  \n  if (isNaN(scheduledTime.getTime())) {\n    continue;\n  }\n  \n  if (scheduledTime <= now) {\n    const caption = row.generated_caption || row.topic_or_prompt || '';\n    validItems.push({\n      json: {\n        ...row,\n        final_caption: caption,\n        post_type: (row.post_type || 'TEXT').toString().trim().toUpperCase()\n      }\n    });\n  }\n}\n\nreturn validItems;"
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445504",
+      "name": "Filter Jadwal & Validasi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.post_type }}",
+                    "rightValue": "IMAGE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image Post"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.post_type }}",
+                    "rightValue": "LINK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Link Post"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445505",
+      "name": "Switch Post Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1260,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $('Set Config & Credentials').item.json.fb_page_id }}/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Set Config & Credentials').item.json.fb_page_access_token }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.media_url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.final_caption }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445506",
+      "name": "Post Image ke FB Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1480,
+        340
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $('Set Config & Credentials').item.json.fb_page_id }}/feed",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Set Config & Credentials').item.json.fb_page_access_token }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.final_caption }}"
+            },
+            {
+              "name": "link",
+              "value": "={{ $json.link_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445507",
+      "name": "Post Link ke FB Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1480,
+        480
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $('Set Config & Credentials').item.json.fb_page_id }}/feed",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Set Config & Credentials').item.json.fb_page_access_token }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.final_caption }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445508",
+      "name": "Post Text ke FB Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1480,
+        620
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tangani respon Meta Graph API untuk menentukan status sukses atau gagal secara presisi\nconst res = $input.item.json;\nconst row = $('Filter Jadwal & Validasi').item.json;\n\nif (res.error) {\n  return {\n    id: row.id,\n    status: 'FAILED',\n    fb_post_id: '',\n    fb_post_url: '',\n    error_log: `${res.error.message} (Code: ${res.error.code})`\n  };\n} else if (res.post_id || res.id) {\n  const postId = res.post_id || res.id;\n  return {\n    id: row.id,\n    status: 'PUBLISHED',\n    fb_post_id: postId,\n    fb_post_url: `https://facebook.com/${postId}`,\n    error_log: ''\n  };\n} else {\n  return {\n    id: row.id,\n    status: 'FAILED',\n    fb_post_id: '',\n    fb_post_url: '',\n    error_log: 'Respon tidak terduga dari Facebook API'\n  };\n}"
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445509",
+      "name": "Format Hasil Respon FB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Set Config & Credentials').item.json.google_sheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Set Config & Credentials').item.json.sheet_name }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "status": "={{ $json.status }}",
+            "fb_post_id": "={{ $json.fb_post_id }}",
+            "fb_post_url": "={{ $json.fb_post_url }}",
+            "error_log": "={{ $json.error_log }}"
+          },
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9d1a20-3b4c-4d5e-8f6a-112233445510",
+      "name": "Update Status di Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1980,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (Setiap 15 Menit)": {
+      "main": [
+        [
+          {
+            "node": "Set Config & Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config & Credentials": {
+      "main": [
+        [
+          {
+            "node": "Ambil Data Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Data Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter Jadwal & Validasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Jadwal & Validasi": {
+      "main": [
+        [
+          {
+            "node": "Switch Post Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Post Type": {
+      "main": [
+        [
+          {
+            "node": "Post Image ke FB Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Link ke FB Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Text ke FB Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Image ke FB Page": {
+      "main": [
+        [
+          {
+            "node": "Format Hasil Respon FB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Link ke FB Page": {
+      "main": [
+        [
+          {
+            "node": "Format Hasil Respon FB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Text ke FB Page": {
+      "main": [
+        [
+          {
+            "node": "Format Hasil Respon FB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Hasil Respon FB": {
+      "main": [
+        [
+          {
+            "node": "Update Status di Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
