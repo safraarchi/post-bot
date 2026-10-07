@@ -204,7 +204,7 @@ function cleanCaption(text) {
  * Menghasilkan konten dinamis lengkap (Teks + Visual Hook + Tag Visual)
  * Mendukung Multi-Produk dengan basis data Knowledge Base teks mentah
  */
-async function generateSmartPost({ product, pillar, existingSummary, isImage, isSpecialAI = false }) {
+async function generateSmartPost({ product, pillar, existingSummary, isImage, isSpecialAI = false, customTopic = '' }) {
   const productName = product?.name || 'Solusi Sawit Nusantara';
   const rawKnowledge = product?.rawKnowledge || `PRODUK: Solusi Sawit Nusantara
 Paket Kombo Pelarut Pupuk Kimia + Biang Kocor seharga Rp 395.000 untuk 2 Hektar.
@@ -222,6 +222,10 @@ Atasi musim trek, pacu bunga betina, hemat pupuk 50%. COD via WA: +62 858-1576-8
 - DILARANG KERAS MENARUH LINK URL APA PUN DI DALAM NASKAH CAPTION (agar jangkauan organik Facebook maksimal tanpa penalti algoritma).
 - Di Paragraf 4, ajak diskusi ramah sesama pembaca/konsumen seputar topik masalah yang dibahas, lalu beri petunjuk bahwa info solusi lengkap ada di bio/kolom komentar.`;
 
+  const topicDirective = (customTopic && customTopic.trim())
+    ? `\nFOKUS / TOPIK KHUSUS YANG DIMINTA PENGGUNA:\n"${customTopic.trim()}"\nFokuskan sudut pandang dan pembahasan utama postingan ini pada topik/keluhan tersebut berdasarkan informasi dokumen produk!\n`
+    : '';
+
   const masterPrompt = `Anda adalah Senior Copywriter & Social Media Specialist profesional untuk produk: "${productName}".
 Tugas Anda: Membuat 1 konten Facebook baru yang memikat, berbobot, dan orisinal berdasarkan Dokumen Produk di bawah ini (Panjang naskah: 80 - 120 kata).
 
@@ -233,10 +237,10 @@ ${rawKnowledge}
 PILAR KONTEN INI: [${pillar.name}]
 ARAHAN PILAR:
 ${pillar.coreInstruction}
-
+${topicDirective}
 ANTI-DUPLIKASI (MUTLAK):
 Berikut ringkasan topik yang sudah pernah diposting sebelumnya:
-${existingSummary}
+${existingSummary || 'Belum ada ringkasan riwayat.'}
 PILIH SUDUT PANDANG / SUB-TOPIK LAIN YANG BELUM DIBAHAS DARI DOKUMEN PRODUK!
 
 ATURAN PENULISAN:

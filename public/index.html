@@ -571,6 +571,179 @@
       border-radius: 16px;
       border: 2px dashed var(--border);
     }
+
+    /* Main Top Navigation Tabs */
+    .main-nav-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      align-items: center;
+    }
+    .nav-tab-btn {
+      padding: 9px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tab-btn:hover {
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+    .nav-tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(5,150,105,0.25);
+    }
+    .nav-pill-badge {
+      background: #f59e0b;
+      color: #0f172a;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1px 7px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Instant Control Card */
+    .instant-control-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+    .instant-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .instant-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .instant-subtitle {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      max-width: 650px;
+      line-height: 1.4;
+    }
+    .instant-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 850px) {
+      .instant-form-grid { grid-template-columns: 1fr; }
+    }
+    .form-group-clean {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .instant-field-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .instant-pill-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .opt-pill {
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .opt-pill:hover {
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+    .opt-pill.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* Instant Spotlight Card */
+    .instant-spotlight-card {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 20px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      box-shadow: 0 10px 30px rgba(5,150,105,0.12);
+      animation: popIn 0.25s ease;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 860px) {
+      .instant-spotlight-card { grid-template-columns: 1fr; }
+    }
+    .spotlight-media-box {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      position: relative;
+      min-height: 280px;
+    }
+    .spotlight-img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block;
+    }
+    .spotlight-content-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .section-title-clean {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
@@ -610,105 +783,209 @@
   <!-- Main Container -->
   <div class="container">
     
-    <!-- Top Action Cards -->
-    <div class="dashboard-top">
-      <div class="actions-card">
-        <!-- Active Product Chip Bar -->
-        <div class="product-chip-bar">
-          <span class="active-prod-badge" id="currentProdBadge">📦 Solusi Sawit Nusantara</span>
-          <span id="currentProdCategory" class="badge-cat">Perkebunan</span>
-          <button class="btn-xs" onclick="openProductModal(currentProductId)">✏️ Edit Knowledge</button>
-        </div>
+    <!-- Main Navigation Tabs -->
+    <div class="main-nav-bar">
+      <button id="navBtnScheduled" class="nav-tab-btn active" onclick="switchMainView('scheduled')">
+        📅 Kalender Terjadwal (Meta Planner)
+      </button>
+      <button id="navBtnInstant" class="nav-tab-btn" onclick="switchMainView('instant')">
+        ⚡ Buat Konten Instan (Posting Sekarang)
+        <span class="nav-pill-badge">Langsung Jadi</span>
+      </button>
+    </div>
 
-        <!-- Compact Duration Slider -->
-        <div class="slider-compact">
-          <div class="slider-header-row">
-            <span class="slider-title-clean">⏳ Rencana Durasi: <strong id="sliderDaysLabel">7 Hari</strong></span>
-            <div class="calc-summary-pill" id="calcSummaryChip">
-              📊 <strong>14 Post</strong> (5 Gambar • 9 Teks)
+    <!-- 1. View: Kalender Terjadwal -->
+    <div id="scheduledView">
+      <!-- Top Action Cards -->
+      <div class="dashboard-top">
+        <div class="actions-card">
+          <!-- Active Product Chip Bar -->
+          <div class="product-chip-bar">
+            <span class="active-prod-badge" id="currentProdBadge">📦 Solusi Sawit Nusantara</span>
+            <span id="currentProdCategory" class="badge-cat">Perkebunan</span>
+            <button class="btn-xs" onclick="openProductModal(currentProductId)">✏️ Edit Knowledge</button>
+          </div>
+
+          <!-- Compact Duration Slider -->
+          <div class="slider-compact">
+            <div class="slider-header-row">
+              <span class="slider-title-clean">⏳ Rencana Durasi: <strong id="sliderDaysLabel">7 Hari</strong></span>
+              <div class="calc-summary-pill" id="calcSummaryChip">
+                📊 <strong>14 Post</strong> (5 Gambar • 9 Teks)
+              </div>
+            </div>
+            
+            <input type="range" id="customDaysSlider" class="range-slider" min="1" max="30" value="7" oninput="syncDaysFromSlider(this.value)">
+            
+            <div class="preset-pills">
+              <button type="button" class="preset-btn" onclick="selectPresetDays(1)">1 Hari (2 Post)</button>
+              <button type="button" class="preset-btn" onclick="selectPresetDays(3)">3 Hari (6 Post)</button>
+              <button type="button" class="preset-btn active" onclick="selectPresetDays(7)">7 Hari (14 Post)</button>
+              <button type="button" class="preset-btn" onclick="selectPresetDays(14)">14 Hari (28 Post)</button>
+              <button type="button" class="preset-btn" onclick="selectPresetDays(30)">30 Hari (60 Post)</button>
             </div>
           </div>
-          
-          <input type="range" id="customDaysSlider" class="range-slider" min="1" max="30" value="7" oninput="syncDaysFromSlider(this.value)">
-          
-          <div class="preset-pills">
-            <button type="button" class="preset-btn" onclick="selectPresetDays(1)">1 Hari (2 Post)</button>
-            <button type="button" class="preset-btn" onclick="selectPresetDays(3)">3 Hari (6 Post)</button>
-            <button type="button" class="preset-btn active" onclick="selectPresetDays(7)">7 Hari (14 Post)</button>
-            <button type="button" class="preset-btn" onclick="selectPresetDays(14)">14 Hari (28 Post)</button>
-            <button type="button" class="preset-btn" onclick="selectPresetDays(30)">30 Hari (60 Post)</button>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="btnGenerateCustom" class="btn btn-primary" onclick="confirmGenerateCustom()">
+              🚀 Buat Konten (<span id="btnCustomCountText">14 Post</span>)
+            </button>
+            <button id="btnGenerate1" class="btn" style="background: #2563eb; color: white;" onclick="confirmGenerate(1)">
+              🧪 Test 1 Gambar
+            </button>
+            <button id="btnRefresh" class="btn btn-secondary" onclick="refreshQueueUI()">
+              🔄 Segarkan
+            </button>
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btnGenerateCustom" class="btn btn-primary" onclick="confirmGenerateCustom()">
-            🚀 Buat Konten (<span id="btnCustomCountText">14 Post</span>)
-          </button>
-          <button id="btnGenerate1" class="btn" style="background: #2563eb; color: white;" onclick="confirmGenerate(1)">
-            🧪 Test 1 Gambar
-          </button>
-          <button id="btnRefresh" class="btn btn-secondary" onclick="refreshQueueUI()">
-            🔄 Segarkan
-          </button>
+        <div class="stats-card">
+          <div class="stat-label">Total Antrean</div>
+          <div id="statTotal" class="stat-number">0</div>
+          <div class="stats-sub-row">
+            <span style="color: #d97706;">⏳ Menunggu: <strong id="statPendingCount">0</strong></span>
+            <span style="color: #059669;">✅ Di Facebook: <strong id="statScheduledCount">0</strong></span>
+          </div>
         </div>
       </div>
 
-      <div class="stats-card">
-        <div class="stat-label">Total Antrean</div>
-        <div id="statTotal" class="stat-number">0</div>
-        <div class="stats-sub-row">
-          <span style="color: #d97706;">⏳ Menunggu: <strong id="statPendingCount">0</strong></span>
-          <span style="color: #059669;">✅ Di Facebook: <strong id="statScheduledCount">0</strong></span>
+      <!-- Filter & Search Toolbar -->
+      <div class="filter-bar">
+        <div class="filter-tabs">
+          <button id="filterAll" class="filter-btn active" onclick="setFilter('all')">
+            Semua <span class="count-pill" id="pillAll">0</span>
+          </button>
+          <button id="filterPending" class="filter-btn" onclick="setFilter('pending')">
+            ⏳ Menunggu <span class="count-pill" id="pillPending">0</span>
+          </button>
+          <button id="filterDone" class="filter-btn" onclick="setFilter('scheduled')">
+            ✅ Di Facebook <span class="count-pill" id="pillScheduled">0</span>
+          </button>
+          <button id="filterImage" class="filter-btn" onclick="setFilter('image')">
+            🖼️ Gambar <span class="count-pill" id="pillImage">0</span>
+          </button>
+          <button id="filterText" class="filter-btn" onclick="setFilter('text')">
+            📄 Teks <span class="count-pill" id="pillText">0</span>
+          </button>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari topik/caption..." oninput="handleSearch(this.value)">
+          </div>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            <input type="checkbox" id="selectAllCheckbox" style="width: 15px; height: 15px; accent-color: var(--primary);" onchange="toggleSelectAll(this.checked)">
+            <span>Pilih Semua</span>
+          </label>
         </div>
       </div>
-    </div>
 
-    <!-- Filter & Search Toolbar -->
-    <div class="filter-bar">
-      <div class="filter-tabs">
-        <button id="filterAll" class="filter-btn active" onclick="setFilter('all')">
-          Semua <span class="count-pill" id="pillAll">0</span>
-        </button>
-        <button id="filterPending" class="filter-btn" onclick="setFilter('pending')">
-          ⏳ Menunggu <span class="count-pill" id="pillPending">0</span>
-        </button>
-        <button id="filterDone" class="filter-btn" onclick="setFilter('scheduled')">
-          ✅ Di Facebook <span class="count-pill" id="pillScheduled">0</span>
-        </button>
-        <button id="filterImage" class="filter-btn" onclick="setFilter('image')">
-          🖼️ Gambar <span class="count-pill" id="pillImage">0</span>
-        </button>
-        <button id="filterText" class="filter-btn" onclick="setFilter('text')">
-          📄 Teks <span class="count-pill" id="pillText">0</span>
-        </button>
-      </div>
-      
-      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" class="search-input" placeholder="Cari topik/caption..." oninput="handleSearch(this.value)">
+      <!-- Sticky Bulk Actions Bar -->
+      <div id="bulkActionsBar" class="bulk-actions-bar">
+        <div style="font-weight: 700; font-size: 13px;">
+          <span id="selectedCountText" style="color: var(--primary); font-size: 15px;">0</span> dipilih
         </div>
-        <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; cursor: pointer;">
-          <input type="checkbox" id="selectAllCheckbox" style="width: 15px; height: 15px; accent-color: var(--primary);" onchange="toggleSelectAll(this.checked)">
-          <span>Pilih Semua</span>
-        </label>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="clearSelection()">Batal</button>
+          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="confirmBulkDelete()">🗑️ Hapus</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Sticky Bulk Actions Bar -->
-    <div id="bulkActionsBar" class="bulk-actions-bar">
-      <div style="font-weight: 700; font-size: 13px;">
-        <span id="selectedCountText" style="color: var(--primary); font-size: 15px;">0</span> dipilih
+      <!-- Posts Grid -->
+      <div id="postsList" class="posts-grid">
+        <!-- Cards rendered via JS -->
       </div>
-      <div style="display: flex; gap: 6px;">
-        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="clearSelection()">Batal</button>
-        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="confirmBulkDelete()">🗑️ Hapus</button>
-      </div>
-    </div>
+    </div> <!-- Close #scheduledView -->
 
-    <!-- Posts Grid -->
-    <div id="postsList" class="posts-grid">
-      <!-- Cards rendered via JS -->
+    <!-- 2. View: Studio Konten Instan (Posting Langsung Tanpa Jadwal) -->
+    <div id="instantView" style="display: none;">
+      <!-- Instant Control Card -->
+      <div class="instant-control-card">
+        <div class="instant-header-row">
+          <div>
+            <h2 class="instant-title">⚡ Studio Konten Instan (Langsung Posting)</h2>
+            <p class="instant-subtitle">Buat 1 postingan memikat seketika untuk langsung di-copy paste ke Facebook. Bebas dari antrean jam atau kalender jadwal.</p>
+          </div>
+          <div class="product-chip-bar" style="margin-bottom: 0;">
+            <span class="active-prod-badge" id="instantProdBadge">📦 Solusi Sawit Nusantara</span>
+            <button class="btn-xs" onclick="openProductModal(currentProductId)">✏️ Edit Knowledge</button>
+          </div>
+        </div>
+
+        <div class="instant-form-grid">
+          <!-- Pillar / Angle Selector -->
+          <div class="form-group-clean">
+            <label class="instant-field-label">🎯 Sudut Pandang / Pilar Konten:</label>
+            <div class="instant-pill-group" id="instantPillarGroup">
+              <button type="button" class="opt-pill active" data-value="SOLUSI_PRODUK" onclick="selectInstantPillar(this, 'SOLUSI_PRODUK')">
+                🌿 Promo & Closing COD
+              </button>
+              <button type="button" class="opt-pill" data-value="EDUKASI_MURNI" onclick="selectInstantPillar(this, 'EDUKASI_MURNI')">
+                💡 Edukasi & Masalah Sawit
+              </button>
+              <button type="button" class="opt-pill" data-value="BERITA_AKTUAL" onclick="selectInstantPillar(this, 'BERITA_AKTUAL')">
+                📰 Riset & Berita Pasar
+              </button>
+              <button type="button" class="opt-pill" data-value="AUTO" onclick="selectInstantPillar(this, 'AUTO')">
+                🎲 Rekomendasi Bebas AI
+              </button>
+            </div>
+          </div>
+
+          <!-- Media Format Selector -->
+          <div class="form-group-clean">
+            <label class="instant-field-label">📸 Format Visual & Media:</label>
+            <div class="instant-pill-group" id="instantMediaGroup">
+              <button type="button" class="opt-pill active" data-value="image_promo" onclick="selectInstantMedia(this, 'image_promo')">
+                📦 Kartu Promo / Foto Fisik Produk
+              </button>
+              <button type="button" class="opt-pill" data-value="image_news" onclick="selectInstantMedia(this, 'image_news')">
+                🖼️ Kartu Berita (1080x1080)
+              </button>
+              <button type="button" class="opt-pill" data-value="text" onclick="selectInstantMedia(this, 'text')">
+                📝 Teks Murni (Tanpa Gambar)
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Topic Input (Optional) -->
+          <div class="form-group-clean" style="grid-column: 1/-1;">
+            <label class="instant-field-label">
+              <span>✏️ Fokus Topik / Masalah Tertentu (Opsional):</span>
+              <span style="font-weight: 500; font-size: 11px; color: var(--text-muted);">Bisa dikosongkan agar AI memilih angle terbaik</span>
+            </label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="instantCustomTopic" class="form-input" placeholder="Contoh: Daun menguning & buah trek, cara kocor drum 200 liter, hemat pupuk kimia...">
+              <button id="btnGenerateInstant" class="btn btn-primary" style="white-space: nowrap; padding: 10px 22px; font-size: 13.5px;" onclick="executeGenerateInstant()">
+                ⚡ Buat Konten Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spotlight: Hasil Generate Terkini -->
+      <div id="instantResultSection" style="display: none; margin-top: 24px;">
+        <div class="section-title-clean">
+          <span>🎉 Konten Instan Siap Diposting</span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Langsung salin caption & unduh gambarnya di bawah:</span>
+        </div>
+        <div id="instantResultCardWrap">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Riwayat Postingan Instan -->
+      <div style="margin-top: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 15px; font-weight: 800;">📚 Riwayat Konten Instan Terakhir (<span id="instantHistoryCount">0</span>)</h3>
+          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11px;" onclick="clearInstantHistory()">🗑️ Bersihkan Riwayat</button>
+        </div>
+        <div id="instantHistoryList" class="posts-grid">
+          <!-- Cards rendered via JS -->
+        </div>
+      </div>
     </div>
 
   </div>
@@ -808,6 +1085,12 @@
     let currentCustomDays = 7;
     const expandedCaptions = new Set();
 
+    // State Studio Konten Instan
+    let currentMainView = 'scheduled'; // 'scheduled' | 'instant'
+    let selectedInstantPillar = 'SOLUSI_PRODUK';
+    let selectedInstantMedia = 'image_promo';
+    let instantHistoryData = [];
+
     window.addEventListener('DOMContentLoaded', async () => {
       initTheme();
       updateScheduleCalculations(currentCustomDays);
@@ -844,6 +1127,31 @@
       toast.innerText = msg;
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 2200);
+    }
+
+    // ==========================================
+    // 1.5. NAVIGASI TAB UTAMA (JADWAL vs INSTAN)
+    // ==========================================
+    function switchMainView(viewName) {
+      currentMainView = viewName;
+      const navSched = document.getElementById('navBtnScheduled');
+      const navInst = document.getElementById('navBtnInstant');
+      const viewSched = document.getElementById('scheduledView');
+      const viewInst = document.getElementById('instantView');
+
+      if (viewName === 'instant') {
+        if (navSched) navSched.classList.remove('active');
+        if (navInst) navInst.classList.add('active');
+        if (viewSched) viewSched.style.display = 'none';
+        if (viewInst) viewInst.style.display = 'block';
+        fetchInstantHistory();
+      } else {
+        if (navSched) navSched.classList.add('active');
+        if (navInst) navInst.classList.remove('active');
+        if (viewSched) viewSched.style.display = 'block';
+        if (viewInst) viewInst.style.display = 'none';
+        fetchQueue();
+      }
     }
 
     // ==========================================
@@ -884,16 +1192,22 @@
     function switchProduct(prodId) {
       currentProductId = prodId;
       updateActiveProductBanner();
-      fetchQueue();
+      if (currentMainView === 'instant') {
+        fetchInstantHistory();
+      } else {
+        fetchQueue();
+      }
     }
 
     function updateActiveProductBanner() {
       const badgeEl = document.getElementById('currentProdBadge');
       const catEl = document.getElementById('currentProdCategory');
+      const instantBadgeEl = document.getElementById('instantProdBadge');
 
       if (currentProductId === 'all') {
         if (badgeEl) badgeEl.innerText = '🌐 Semua Produk';
         if (catEl) catEl.innerText = `${productsData.length} Produk Terdaftar`;
+        if (instantBadgeEl) instantBadgeEl.innerText = (productsData.length > 0) ? `📦 ${productsData[0].name}` : 'Pilih Produk';
         return;
       }
 
@@ -901,11 +1215,285 @@
       if (!cur) {
         if (badgeEl) badgeEl.innerText = 'Pilih Produk';
         if (catEl) catEl.innerText = '-';
+        if (instantBadgeEl) instantBadgeEl.innerText = 'Pilih Produk';
         return;
       }
 
       if (badgeEl) badgeEl.innerText = `📦 ${cur.name}`;
       if (catEl) catEl.innerText = cur.category || 'Umum';
+      if (instantBadgeEl) instantBadgeEl.innerText = `📦 ${cur.name}`;
+    }
+
+    // ==========================================
+    // 2.5. LOGIKA STUDIO KONTEN INSTAN
+    // ==========================================
+    function selectInstantPillar(btn, val) {
+      document.querySelectorAll('#instantPillarGroup .opt-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedInstantPillar = val;
+    }
+
+    function selectInstantMedia(btn, val) {
+      document.querySelectorAll('#instantMediaGroup .opt-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedInstantMedia = val;
+    }
+
+    async function executeGenerateInstant() {
+      let targetProduct = productsData.find(p => p.id === currentProductId);
+      if (!targetProduct && productsData.length > 0) {
+        targetProduct = productsData[0];
+      }
+      if (!targetProduct) {
+        alert('Tambahkan produk terlebih dahulu di menu Kelola Produk!');
+        return;
+      }
+
+      const btn = document.getElementById('btnGenerateInstant');
+      const customTopicInput = document.getElementById('instantCustomTopic');
+      const customTopic = customTopicInput ? customTopicInput.value.trim() : '';
+
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ AI sedang membuat postingan...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/generate-instant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: targetProduct.id,
+            pillarKey: selectedInstantPillar,
+            mediaType: selectedInstantMedia,
+            customTopic
+          })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        renderInstantSpotlight(data.post);
+        instantHistoryData.unshift(data.post);
+        renderInstantHistory();
+        showToast('🎉 Postingan instan siap diposting ke Facebook!');
+
+        const spotEl = document.getElementById('instantResultSection');
+        if (spotEl) {
+          spotEl.style.display = 'block';
+          spotEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } catch (err) {
+        alert('Gagal membuat konten instan: ' + err.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    function renderInstantSpotlight(post) {
+      const sec = document.getElementById('instantResultSection');
+      const wrap = document.getElementById('instantResultCardWrap');
+      if (!sec || !wrap) return;
+
+      sec.style.display = 'block';
+
+      const imageHtml = post.isImage && post.imagePath
+        ? `<div class="spotlight-media-box">
+             <img src="${post.imagePath}" alt="${escapeHtml(post.topic || 'Gambar')}" class="spotlight-img">
+             <div style="padding: 10px; width: 100%; text-align: center; background: rgba(0,0,0,0.65); position: absolute; bottom: 0;">
+               <a href="${post.imagePath}" download="foto_${post.id}.jpg" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; width: 100%; justify-content: center;">
+                 💾 Unduh Foto (1080x1080)
+               </a>
+             </div>
+           </div>`
+        : `<div class="spotlight-media-box" style="background: var(--caption-bg); color: var(--text-muted); font-size: 13px; font-weight: 700; text-align: center; padding: 30px;">
+             📝 Postingan Teks Murni<br><small style="font-weight: 400; margin-top: 4px; display: block;">Format teks murni untuk reach organik Facebook maksimal</small>
+           </div>`;
+
+      wrap.innerHTML = `
+        <div class="instant-spotlight-card">
+          ${imageHtml}
+          <div class="spotlight-content-box">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan (Langsung Posting)</span>
+                  <span class="badge-pill-clean">${escapeHtml(post.pillar || 'Solusi')}</span>
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">📦 ${escapeHtml(post.productName)}</span>
+              </div>
+
+              <h3 style="font-size: 18px; font-weight: 900; color: var(--text-main); margin-bottom: 12px; line-height: 1.3;">
+                ${escapeHtml(post.topic || 'Konten Siap Pakai')}
+              </h3>
+
+              <div style="position: relative;">
+                <textarea id="spotlightCaptionText" class="form-textarea" style="min-height: 170px; font-size: 13px; line-height: 1.6;" readonly>${escapeHtml(post.caption)}</textarea>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+              <button class="btn btn-primary" style="padding: 10px 20px; font-size: 13px; flex: 1; justify-content: center;" onclick="copySpotlightCaption()">
+                📋 Salin Caption Facebook
+              </button>
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="btn" style="background: #1877f2; color: white; padding: 10px 18px; font-size: 13px;">
+                🌐 Buka Facebook ↗
+              </a>
+              <button class="btn btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="executeGenerateInstant()">
+                🎲 Buat Variasi Lain
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copySpotlightCaption() {
+      const ta = document.getElementById('spotlightCaptionText');
+      if (!ta) return;
+      ta.select();
+      navigator.clipboard.writeText(ta.value).then(() => {
+        showToast('📋 Caption berhasil disalin! Siap dipaste ke Facebook.');
+      }).catch(() => {
+        document.execCommand('copy');
+        showToast('📋 Caption berhasil disalin!');
+      });
+    }
+
+    async function fetchInstantHistory() {
+      try {
+        const prodParam = (currentProductId && currentProductId !== 'all') ? `?productId=${currentProductId}` : '';
+        const res = await fetch(`/api/instant-posts${prodParam}`);
+        instantHistoryData = await res.json();
+        renderInstantHistory();
+      } catch (e) {
+        console.error('Error fetching instant posts:', e);
+      }
+    }
+
+    function renderInstantHistory() {
+      const listEl = document.getElementById('instantHistoryList');
+      const countEl = document.getElementById('instantHistoryCount');
+      if (!listEl) return;
+
+      if (countEl) countEl.innerText = instantHistoryData.length;
+
+      if (instantHistoryData.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-box">
+            <div style="font-size: 36px; margin-bottom: 8px;">⚡</div>
+            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Belum Ada Riwayat Konten Instan</h3>
+            <p style="font-size: 12.5px; color: var(--text-muted);">Pilih produk & gaya konten di atas, lalu klik <strong>Buat Konten Sekarang</strong>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = '';
+      instantHistoryData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+
+        const imageHtml = item.isImage && item.imagePath
+          ? `<div class="post-image-container">
+               <img src="${item.imagePath}" alt="${escapeHtml(item.topic)}" class="post-image" loading="lazy">
+             </div>`
+          : `<div class="post-image-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--caption-bg); height: 180px; aspect-ratio: unset;">
+               <span style="font-size: 26px;">📝</span>
+               <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Postingan Teks Murni</span>
+             </div>`;
+
+        const timeStr = item.createdAt ? new Date(item.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Baru saja';
+
+        card.innerHTML = `
+          ${imageHtml}
+          <div class="card-content">
+            <div class="card-meta-row">
+              <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">🕒 ${timeStr}</span>
+            </div>
+
+            <div style="font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 2px;">
+              📦 ${escapeHtml(item.productName || 'Produk')}
+            </div>
+
+            <div class="card-title-text">${escapeHtml(item.topic || 'Topik Konten')}</div>
+
+            <div id="instant-caption-view-${item.id}" class="caption-container is-collapsed">${escapeHtml(item.caption)}</div>
+            <button class="btn-toggle-caption" onclick="toggleInstantCaptionExpand('${item.id}')">
+              Lihat Selengkapnya ▾
+            </button>
+
+            <div class="card-footer">
+              <button class="btn-action btn-action-primary" onclick="copyInstantHistoryCaption('${item.id}')" title="Salin Caption">
+                📋 Salin Caption
+              </button>
+              <div style="display: flex; gap: 4px;">
+                ${item.isImage && item.imagePath ? `
+                  <a href="${item.imagePath}" download="foto_${item.id}.jpg" class="btn-action" title="Unduh foto">
+                    💾 Unduh
+                  </a>
+                ` : ''}
+                <button class="btn-action" onclick="deleteInstantPost('${item.id}')" title="Hapus dari riwayat" style="color: var(--danger);">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        listEl.appendChild(card);
+      });
+    }
+
+    function toggleInstantCaptionExpand(id) {
+      const el = document.getElementById(`instant-caption-view-${id}`);
+      if (!el) return;
+      const btn = el.nextElementSibling;
+      const isCol = el.classList.toggle('is-collapsed');
+      if (btn) btn.innerText = isCol ? 'Lihat Selengkapnya ▾' : 'Tutup ▴';
+    }
+
+    function copyInstantHistoryCaption(id) {
+      const item = instantHistoryData.find(p => p.id === id);
+      if (!item) return;
+      navigator.clipboard.writeText(item.caption).then(() => {
+        showToast('📋 Caption berhasil disalin!');
+      }).catch(() => {
+        showToast('📋 Gagal menyalin caption.');
+      });
+    }
+
+    async function deleteInstantPost(id) {
+      if (!confirm('Hapus konten instan ini dari riwayat?')) return;
+      try {
+        const res = await fetch('/api/instant-posts/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        instantHistoryData = instantHistoryData.filter(p => p.id !== id);
+        renderInstantHistory();
+        showToast('🗑️ Konten instan dihapus dari riwayat.');
+      } catch (e) {
+        alert('Gagal menghapus: ' + e.message);
+      }
+    }
+
+    async function clearInstantHistory() {
+      if (!confirm('Kosongkan semua riwayat postingan instan?')) return;
+      try {
+        const res = await fetch('/api/instant-posts/clear', { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        instantHistoryData = [];
+        renderInstantHistory();
+        showToast('🗑️ Riwayat postingan instan telah dibersihkan.');
+      } catch (e) {
+        alert('Gagal membersihkan: ' + e.message);
+      }
     }
 
     // ==========================================

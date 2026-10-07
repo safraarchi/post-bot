@@ -35,6 +35,7 @@ const PORT = 3300;
 const HTML_FILE_PATH = path.join(__dirname, '..', 'public', 'index.html');
 const PRODUCTS_FILE = path.join(__dirname, '..', 'data', 'products.json');
 const QUEUE_FILE = path.join(__dirname, '..', 'data', 'content_queue.json');
+const INSTANT_POSTS_FILE = path.join(__dirname, '..', 'data', 'instant_posts.json');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 // ==========================================
@@ -72,6 +73,23 @@ function getQueue() {
 
 function saveQueue(queue) {
   fs.writeFileSync(QUEUE_FILE, JSON.stringify(queue, null, 2), 'utf8');
+}
+
+function getInstantPosts() {
+  if (!fs.existsSync(INSTANT_POSTS_FILE)) {
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(INSTANT_POSTS_FILE, 'utf8');
+    return JSON.parse(raw || '[]');
+  } catch (e) {
+    console.error('Error reading instant_posts.json:', e.message);
+    return [];
+  }
+}
+
+function saveInstantPosts(posts) {
+  fs.writeFileSync(INSTANT_POSTS_FILE, JSON.stringify(posts, null, 2), 'utf8');
 }
 
 // Menghitung slot jadwal harian (08:00 Pagi & 18:30 Sore WIB)
@@ -694,7 +712,158 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 14. API: Matikan Server Lokal
+  // 14. API: Ambil Riwayat Postingan Instan
+  if (req.method === 'GET' && url.pathname === '/api/instant-posts') {
+    try {
+      const productId = url.searchParams.get('productId');
+      let posts = getInstantPosts();
+      if (productId && productId !== 'all') {
+        posts = posts.filter(p => p.productId === productId);
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify(posts));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // 15. API: Generate Konten Instan (Langsung Posting Tanpa Masuk Jadwal)
+  if (req.method === 'POST' && url.pathname === '/api/generate-instant') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const { productId, pillarKey = 'AUTO', mediaType = 'image_promo', customTopic = '' } = payload;
+
+        const products = getProducts();
+        let selectedProduct = products.find(p => p.id === productId);
+        if (!selectedProduct && products.length > 0) {
+          selectedProduct = products[0];
+        }
+        if (!selectedProduct) {
+          throw new Error('Belum ada produk yang terdaftar. Tambahkan produk terlebih dahulu di menu Kelola Produk!');
+        }
+
+        // Tentukan pilar konten
+        let targetPillar = null;
+        if (pillarKey && PILLARS[pillarKey]) {
+          targetPillar = PILLARS[pillarKey];
+        } else if (mediaType === 'image_promo') {
+          targetPillar = PILLARS.SOLUSI_PRODUK;
+        } else {
+          const options = [PILLARS.EDUKASI_MURNI, PILLARS.BERITA_AKTUAL, PILLARS.SOLUSI_PRODUK];
+          targetPillar = options[Math.floor(Math.random() * options.length)];
+        }
+
+        const isImage = (mediaType !== 'text');
+
+        console.log(`\n======================================================`);
+        console.log(`⚡ GENERATE KONTEN INSTAN: [${selectedProduct.name}]`);
+        console.log(`   Pilar: ${targetPillar.name} | Media: ${mediaType}`);
+        if (customTopic) console.log(`   Topik Khusus: "${customTopic}"`);
+        console.log(`======================================================`);
+
+        // Generate Naskah Cerdas
+        const postData = await generateSmartPost({
+          product: selectedProduct,
+          pillar: targetPillar,
+          existingSummary: '',
+          isImage,
+          isSpecialAI: false,
+          customTopic
+        });
+
+        // Generate Gambar jika diminta
+        let imageRelUrl = null;
+        if (isImage) {
+          try {
+            if (mediaType === 'image_promo') {
+              postData.pillar = PILLARS.SOLUSI_PRODUK;
+              postData.imageTag = 'PRODUK_OFFICIAL';
+            }
+            const itemIndex = Math.floor(Math.random() * 50) + 1;
+            const imgRes = await createLocalImage(postData, itemIndex, new Set());
+            if (imgRes && imgRes.relUrl) {
+              imageRelUrl = imgRes.relUrl;
+            }
+          } catch (imgErr) {
+            console.warn('Gagal merender gambar instan:', imgErr.message);
+          }
+        }
+
+        const newPost = {
+          id: `INSTANT-${Date.now()}`,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name,
+          topic: postData.visualHook,
+          visualSummary: postData.visualSummary,
+          pillar: targetPillar.name,
+          pillarKey: targetPillar.key,
+          pillarBadge: targetPillar.badgeLabel,
+          pillarColor: targetPillar.badgeColor,
+          caption: postData.caption,
+          imagePath: imageRelUrl,
+          isImage: !!imageRelUrl,
+          mediaType: mediaType,
+          customTopic: customTopic || null,
+          createdAt: new Date().toISOString()
+        };
+
+        // Simpan ke riwayat lokal instant_posts.json (TIDAK masuk ke kalender content_queue.json)
+        const instantPosts = getInstantPosts();
+        instantPosts.unshift(newPost);
+        if (instantPosts.length > 100) instantPosts.pop();
+        saveInstantPosts(instantPosts);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, post: newPost }));
+      } catch (err) {
+        console.error('Error generate instant post:', err.message);
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 16. API: Hapus Postingan Instan dari Riwayat
+  if (req.method === 'POST' && url.pathname === '/api/instant-posts/delete') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { id } = JSON.parse(body || '{}');
+        if (!id) throw new Error('ID postingan diperlukan');
+        let posts = getInstantPosts();
+        posts = posts.filter(p => p.id !== id);
+        saveInstantPosts(posts);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // 17. API: Bersihkan Semua Riwayat Postingan Instan
+  if (req.method === 'POST' && url.pathname === '/api/instant-posts/clear') {
+    try {
+      saveInstantPosts([]);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+    return;
+  }
+
+  // 18. API: Matikan Server Lokal
   if (req.method === 'POST' && url.pathname === '/api/shutdown') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, message: 'Server dihentikan' }));
