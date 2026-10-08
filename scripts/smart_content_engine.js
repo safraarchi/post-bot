@@ -184,7 +184,7 @@ function callAgyPrompt(promptText) {
  */
 function cleanCaption(text) {
   if (!text) return '';
-  return text
+  let cleaned = text
     // Hapus tanda kutip pembungkus
     .replace(/^["'“]([\s\S]*)["'”]$/, '$1')
     // Hapus simbol markdown tebal ** atau *
@@ -198,6 +198,15 @@ function cleanCaption(text) {
     .replace(/[ \t]+$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+  // ATURAN MUTLAK: Hilangkan semua penyebutan harga nominal rupiah (Rp ...)
+  cleaned = cleaned
+    .replace(/se?harga\s*(Rp\.?\s*[\d.,]+(\s*per\s*[a-zA-Z0-9]+)?)/gi, 'dengan penawaran promo spesial')
+    .replace(/cuma\s*Rp\.?\s*[\d.,]+(\s*per\s*[a-zA-Z0-9]+)?/gi, 'dapatkan promo spesial')
+    .replace(/hanya\s*Rp\.?\s*[\d.,]+(\s*per\s*[a-zA-Z0-9]+)?/gi, 'dapatkan promo spesial')
+    .replace(/Rp\.?\s*[\d.,]+[/-]?\s*(per\s*[a-zA-Z0-9]+)?/gi, 'promo spesial');
+
+  return cleaned;
 }
 
 /**
@@ -207,7 +216,7 @@ function cleanCaption(text) {
 async function generateSmartPost({ product, pillar, existingSummary, isImage, isSpecialAI = false, customTopic = '' }) {
   const productName = product?.name || 'Solusi Sawit Nusantara';
   const rawKnowledge = product?.rawKnowledge || `PRODUK: Solusi Sawit Nusantara
-Paket Kombo Pelarut Pupuk Kimia + Biang Kocor seharga Rp 395.000 untuk 2 Hektar.
+Paket Kombo Pelarut Pupuk Kimia + Biang Kocor untuk perawatan kebun sawit.
 SOP 3 Langkah: Drum 200L air + 1L Biang Kocor + 1Kg Pelarut, dosis 1 botol 1.5L per pokok ke piringan.
 Atasi musim trek, pacu bunga betina, hemat pupuk 50%. COD via WA: +62 858-1576-8319`;
 
@@ -216,10 +225,11 @@ Atasi musim trek, pacu bunga betina, hemat pupuk 50%. COD via WA: +62 858-1576-8
 
   const ctaRule = isPromo
     ? `ATURAN KHUSUS KONTEN PROMO / CLOSING JUALAN:
-- Naskah ini bertujuan penawaran solusi produk / closing.
-- Di Paragraf 4, WAJIB sertakan Call To Action penawaran sesuai informasi di Dokumen Produk (misal nomor WhatsApp, cara pemesanan, atau format COD jika ada di dokumen).`
+- Naskah ini bertujuan penawaran promosi produk & ajakan menghubungi kami.
+- ATURAN HARGA MUTLAK: DILARANG KERAS MENCANTUMKAN HARGA (NOMINAL RP / ANGKA RUPIAH APA PUN) DI DALAM POSTINGAN MAUPUN JUDUL GAMBAR! Cukup tonjolkan promo spesial / penawaran terbatas dan kemudahan bayar di tempat (COD).
+- Di Paragraf 4, WAJIB sertakan Call To Action ajakan untuk "Hubungi kami via WhatsApp" atau kontak CS di Dokumen Produk untuk info promo spesial & konsultasi gratis (tanpa mencantumkan nominal harga).`
     : `ATURAN KHUSUS KONTEN EDUKASI & BERITA (JANGKAUAN ORGANIK LUAS):
-- DILARANG KERAS MENARUH LINK URL APA PUN DI DALAM NASKAH CAPTION (agar jangkauan organik Facebook maksimal tanpa penalti algoritma).
+- DILARANG KERAS MENARUH HARGA (NOMINAL RP) DAN LINK URL APA PUN DI DALAM NASKAH CAPTION (agar jangkauan organik Facebook maksimal tanpa penalti algoritma).
 - Di Paragraf 4, ajak diskusi ramah sesama pembaca/konsumen seputar topik masalah yang dibahas, lalu beri petunjuk bahwa info solusi lengkap ada di bio/kolom komentar.`;
 
   const topicDirective = (customTopic && customTopic.trim())
@@ -245,14 +255,15 @@ PILIH SUDUT PANDANG / SUB-TOPIK LAIN YANG BELUM DIBAHAS DARI DOKUMEN PRODUK!
 
 ATURAN PENULISAN:
 1. DILARANG MENGGUNAKAN TANDA BINTANG MARKDOWN (** ATAU *). Facebook tidak mendukung markdown sehingga bintang terlihat kotor. Gunakan huruf kapital wajar atau emoji (📌, 💡, 👉, ✅) untuk penekanan.
-2. Format scannable di HP dengan jeda 1 baris kosong antar paragraf:
+2. DILARANG KERAS MENCANTUMKAN HARGA (Rp/nominal rupiah): Jangan cantumkan angka rupiah berapa pun (seperti Rp 395.000 atau Rp 550.000). Cukup gunakan penawaran promo spesial / promo terbatas, bayar aman sistem COD saat barang sampai, dan ajak "Hubungi kami via WhatsApp".
+3. Format scannable di HP dengan jeda 1 baris kosong antar paragraf:
    - Paragraf 1: Hook memikat langsung ke keluhan nyata / masalah utama target konsumen.
    - [Jeda 1 baris]
    - Paragraf 2: 2-3 Poin ringkas ber-bullet emoji (📌 atau 👉) yang mengedukasi atau menjelaskan fakta.
    - [Jeda 1 baris]
    - Paragraf 3: Solusi teknis atau pembuktian manfaat sesuai dokumen produk di atas.
    - [Jeda 1 baris]
-   - Paragraf 4: ${isPromo ? 'Call To Action penawaran langsung sesuai kontak/cara order di dokumen produk' : 'Pertanyaan diskusi ramah + petunjuk info di komentar'}
+   - Paragraf 4: ${isPromo ? 'Call To Action ajakan hubungi kami via WhatsApp untuk konsultasi gratis & info promo spesial' : 'Pertanyaan diskusi ramah + petunjuk info di komentar'}
    - [Jeda 1 baris]
    - Paragraf 5: 3-4 Hashtag relevan yang diawali #${cleanTag}
 
@@ -260,13 +271,13 @@ ${ctaRule}
 
 FORMAT RESPON (WAJIB IKUTI PERSIS AGAR BISA DIPARSING SISTEM):
 ---VISUAL_HOOK---
-[Tulis 1 kalimat judul kartu gambar, MAKSIMAL 5-7 KATA, huruf kapital menarik]
+[Tulis 1 kalimat judul kartu gambar TANPA HARGA, MAKSIMAL 5-7 KATA, huruf kapital menarik]
 ---VISUAL_SUMMARY---
-[Tulis 1 kalimat penjelasan ringkas untuk subjudul kartu gambar, maksimal 12 kata]
+[Tulis 1 kalimat penjelasan ringkas untuk subjudul kartu gambar TANPA HARGA, maksimal 12 kata]
 ---IMAGE_TAG---
 [Pilih kategori foto paling relevan atau KEBUN_TERAWAT]
 ---CAPTION---
-[Tulis naskah Facebook lengkap Anda di sini]`;
+[Tulis naskah Facebook lengkap Anda di sini TANPA MENYEBUT NOMINAL HARGA]`;
 
   console.log(`   🧠 [Smart AI] Menulis konten orisinal untuk [${productName}] - Pilar: ${pillar.name}...`);
   const rawOutput = await callAgyPrompt(masterPrompt);
@@ -293,6 +304,17 @@ FORMAT RESPON (WAJIB IKUTI PERSIS AGAR BISA DIPARSING SISTEM):
   if (captionMatch) {
     caption = captionMatch[1].trim();
   }
+
+  const scrubPrice = (str) => {
+    if (!str) return '';
+    return str
+      .replace(/se?harga\s*(Rp\.?\s*[\d.,]+)/gi, 'Promo Spesial')
+      .replace(/Rp\.?\s*[\d.,]+[/-]?/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  };
+  visualHook = scrubPrice(visualHook);
+  visualSummary = scrubPrice(visualSummary);
 
   caption = cleanCaption(caption);
 

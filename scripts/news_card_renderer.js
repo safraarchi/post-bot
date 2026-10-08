@@ -192,11 +192,8 @@ async function renderPromoCard({
   bgImgPath,
   badgePromo = 'PAKET KOMBO RESMI',
   badgeCod = '🚚 100% BISA COD',
-  strikePrice = 'Rp 550.000',
-  mainPrice = 'Rp 395.000,-',
-  priceSub = 'Cukup untuk Perawatan Kebun',
-  pill1 = '🛒 SOP Drum 200L + Botol 1.5L',
-  pill2 = '📦 Bayar Aman di Tempat ke Kurir'
+  pill1 = '🛒 Paket Lengkap Siap Pakai',
+  pill2 = '💬 Hubungi Kontak Kami'
 }) {
   const finalProductImg = productImgPath && fs.existsSync(productImgPath)
     ? productImgPath
@@ -313,17 +310,17 @@ async function renderPromoCard({
       z-index: 10;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .price-block {
-      display: flex; flex-direction: column;
+    .promo-highlight-block {
+      display: flex; flex-direction: column; justify-content: center;
     }
-    .strike-price {
-      font-size: 16px; color: #94a3b8; text-decoration: line-through; font-weight: 700;
+    .promo-tag-title {
+      font-size: 14px; color: #facc15; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;
     }
-    .main-price {
-      font-size: 34px; color: #34d399; font-weight: 900; line-height: 1.1;
+    .promo-main-cta {
+      font-size: 26px; color: #ffffff; font-weight: 900; line-height: 1.15;
     }
-    .price-sub {
-      font-size: 13px; color: #cbd5e1; font-weight: 600;
+    .promo-sub-cta {
+      font-size: 13px; color: #cbd5e1; font-weight: 600; margin-top: 4px;
     }
     .cta-pills {
       display: flex; flex-direction: column; gap: 8px; text-align: right;
@@ -352,10 +349,10 @@ async function renderPromoCard({
   </div>
 
   <div class="bottom-box">
-    <div class="price-block">
-      <span class="strike-price">${strikePrice}</span>
-      <span class="main-price">${mainPrice}</span>
-      <span class="price-sub">${priceSub}</span>
+    <div class="promo-highlight-block">
+      <span class="promo-tag-title">🎁 PROMO SPESIAL TERBATAS</span>
+      <span class="promo-main-cta">Konsultasi Kebun & Order via WA</span>
+      <span class="promo-sub-cta">Bayar Aman di Tempat (100% COD)</span>
     </div>
     <div class="cta-pills">
       <div class="pill">${pill1}</div>

@@ -209,7 +209,7 @@ async function createImagePost(postData, itemIndex) {
       console.log(`   🎨 [Render Promo Resmi] Merender kartu produk transparan 1080x1080 (tanpa distorsi AI)...`);
       await renderPromoCard({
         headlineHtml: visualHook || 'Paket Kombo Solusi Sawit Nusantara',
-        summaryText: visualSummary || 'Paket Kombo Rp 395.000 untuk 2 Hektar. Bisa COD.',
+        summaryText: visualSummary || 'Paket Kombo Lengkap untuk 2 Hektar. Bisa COD.',
         outputPath: outPromo
       });
       return outPromo;

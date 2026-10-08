@@ -241,11 +241,8 @@ async function createLocalImage(postData, itemIndex, usedSet = null) {
         productImgPath: sawitProductImg,
         badgePromo: '🌴 PAKET KOMBO 2 HEKTAR',
         badgeCod: '🚚 100% BISA COD',
-        strikePrice: 'Rp 550.000',
-        mainPrice: 'Rp 395.000,-',
-        priceSub: 'Cukup untuk 2 Hektar Kebun Sawit',
         pill1: '🛒 1 Botol Pelarut + 1 Botol Biang',
-        pill2: '📦 Bayar di Tempat (COD)'
+        pill2: '💬 Konsultasi & Order via WA'
       });
       return { fullPath: outPromo, relUrl: `/images/${filename}` };
     } catch (e) {

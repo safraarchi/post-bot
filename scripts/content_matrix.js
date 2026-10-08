@@ -106,7 +106,7 @@ PENTING: Murni edukasi, tanpa jualan produk.`
     categoryLabel: 'SOP KOCOR SAWIT',
     categoryColor: 'green',
     headlineHtml: 'SOP Kocor Sawit Praktis: <span class="headline-highlight">Hemat Biaya Pupuk Hingga 50%!</span>',
-    summaryText: 'Aplikasi mudah: Drum 200L + Botol 1,5L ke piringan pokok. Paket Rp 395.000 / 2 Ha.',
+    summaryText: 'Aplikasi mudah: Drum 200L + Botol 1,5L ke piringan pokok. Paket Kombo Lengkap untuk 2 Ha.',
     topic: 'SOP 3 Langkah Kocor Sawit Praktis (Drum 200L + Botol 1.5L) Hemat Biaya 50%',
     instructions: `Tulis penawaran solutif yang ringkas dan padat (maksimal 90-120 kata):
 - Hook: Mau rawat sawit hasil melimpah tapi biaya pupuk pangkas sampai 50%? Pakai SOP Kocor Praktis ini!
@@ -114,9 +114,9 @@ PENTING: Murni edukasi, tanpa jualan produk.`
   1. Campur 1L Biang Kocor + 1Kg Pelarut Kimia ke dalam drum 200L air.
   2. Ciduk pakai botol 1,5 Liter (Dosis: 1 botol per pokok sawit).
   3. Siram melingkar ke tanah piringan tempat biasa menabur pupuk.
-- Penawaran: Cuma Rp 395.000 untuk 2 Hektar (Paket Kombo Lengkap).
+- Penawaran: Paket Kombo Lengkap untuk 2 Hektar. Promo Spesial Terbatas!
 - COD: Bisa Bayar di Tempat ke seluruh Indonesia!
-- CTA: Ketik 'MAU COD' atau Inbox kami sekarang juga!`
+- CTA: Hubungi kami via WhatsApp atau tulis 'MAU COD' sekarang juga!`
   },
 
   // 6. SOLUSI: Atasi Musim Trek
@@ -126,7 +126,7 @@ PENTING: Murni edukasi, tanpa jualan produk.`
     categoryLabel: 'SOLUSI KOMBO',
     categoryColor: 'green',
     headlineHtml: 'Musim Trek Sawit? <span class="headline-highlight">Pacu Bunga Betina TBS Jumbo!</span>',
-    summaryText: 'Paket Kombo Rp 395.000 untuk 2 Hektar. Bayar Aman di Tempat (COD).',
+    summaryText: 'Paket Kombo Lengkap untuk 2 Hektar. Bayar Aman di Tempat (COD).',
     topic: 'Musim Trek Sawit Bikin Pusing? Pacu Bunga Betina TBS Jumbo dengan Biang Kocor',
     instructions: `Tulis solusi singkat yang memikat (maksimal 90-120 kata):
 - Hook: Pelepah hijau tapi buah sawit gak mau mutar? Keluar dompet isinya bunga jantan melulu?
@@ -134,9 +134,9 @@ PENTING: Murni edukasi, tanpa jualan produk.`
   1. Booster hormon pembuahan: memacu serempak keluarnya bunga betina produktif.
   2. Mencegah bunga dompet rontok dan mempertebal daging buah TBS.
   3. Didukung Pelarut Kimia agar tanah gembur dan bobot timbangan di PKS naik tajam.
-- Paket Kombo Rp 395.000 untuk 2 Hektar.
+- Paket Kombo Lengkap untuk 2 Hektar.
 - Garansi COD (Barang Sampai Baru Bayar).
-- CTA: Mau atasi trek sekarang? Tulis 'PESAN' di komentar atau klik Inbox!`
+- CTA: Mau atasi trek sekarang? Hubungi WhatsApp kami atau tulis 'PESAN' di komentar!`
   },
 
   // 7. EDUKASI: Songgo Pelepah (Songgo 2)
@@ -236,7 +236,7 @@ PENTING: Murni edukasi, tanpa jualan produk.`
     categoryLabel: 'DONGKRAK TONASE',
     categoryColor: 'green',
     headlineHtml: 'Timbangan di RAM Sering Ringan? <span class="headline-highlight">Bikin Brondolan Padat Bernas!</span>',
-    summaryText: 'Nutrisi kocor aktif mengalirkan karbohidrat ke tandan. Paket Kombo Rp 395.000 / 2 Ha.',
+    summaryText: 'Nutrisi kocor aktif mengalirkan karbohidrat ke tandan. Paket Kombo Lengkap untuk 2 Ha.',
     topic: 'Dongkrak Bobot Janjang TBS: Peran Sinergi Biang Kocor dan Pelarut Kimia',
     instructions: `Tulis promosi solutif berbobot (maksimal 90-120 kata):
 - Hook: Janjang kelihatan besar tapi pas ditimbang di RAM bobotnya malah enteng? Itu tanda brondolan kopong!
@@ -244,9 +244,9 @@ PENTING: Murni edukasi, tanpa jualan produk.`
   1. Biang Kocor memacu pembesaran sel daging buah dan kepadatan minyak CPO.
   2. Pelarut Pupuk Kimia melarutkan deposit pupuk lama di tanah agar tersedot tuntas ke buah.
   3. Hasil timbangan naik nyata mulai bulan ke-3 aplikasi teratur.
-- Harga: Rp 395.000 untuk 2 Hektar (Duo Kombo).
+- Penawaran: Paket Kombo Lengkap untuk 2 Hektar. Promo Terbatas!
 - Bayar COD di tempat saat paket tiba di kebun Anda!
-- CTA: Mau timbangan panen berikutnya melonjak? Ketik 'ORDER' sekarang!`
+- CTA: Mau timbangan panen berikutnya melonjak? Hubungi WhatsApp kami sekarang!`
   },
 
   // 13. EDUKASI: Kumbang Tanduk & Ulat Api
@@ -345,17 +345,17 @@ PENTING: Murni edukasi, tanpa jualan produk.`
     category: 'SOLUSI_PRODUK',
     categoryLabel: 'HITUNGAN HEMAT',
     categoryColor: 'green',
-    headlineHtml: 'Rawat Sawit Cuma Rp 1.450/Pohon! <span class="headline-highlight">Paket Kombo 2 Hektar Cuma Rp 395.000</span>',
+    headlineHtml: 'Rawat Sawit Hemat & Efisien! <span class="headline-highlight">Paket Kombo Lengkap 2 Hektar</span>',
     summaryText: 'Pangkas biaya pupuk kimia hingga separuh. Dosis resmi: Drum 200L + Botol 1.5L.',
-    topic: 'Simulasi Penghematan Biaya Kebun Sawit: Paket Kombo Rp 395.000 untuk 2 Hektar',
+    topic: 'Simulasi Penghematan Biaya Kebun Sawit: Paket Kombo untuk 2 Hektar',
     instructions: `Tulis penawaran ekonomis yang meyakinkan (maksimal 90-120 kata):
-- Hook: Biaya pupuk makin mencekik leher? Kini ada cara cerdas rawat sawit cuma Rp 1.450 per pokok!
+- Hook: Biaya pupuk makin mencekik leher? Kini ada cara cerdas rawat sawit jauh lebih hemat dan efisien!
 - Rincian Paket Kombo:
-  1. Cukup bayar Rp 395.000, sudah mencukupi untuk 2 Hektar (± 260-280 pokok sawit).
+  1. Cukup ambil Paket Kombo, sudah mencukupi untuk 2 Hektar (± 260-280 pokok sawit).
   2. Berisi 1 Kg Pelarut Kimia + 1 Liter Biang Kocor (Duo Nutrisi Lengkap).
   3. Aplikasi sangat gampang: 1 Drum 200L air + takar botol 1,5L per pohon ke piringan.
 - Garansi 100% COD: Barang sampai di kebun baru bayar ke kurir!
-- CTA: Ambil promo paket hemat sekarang juga, ketik 'PESAN' di kolom komentar!`
+- CTA: Hubungi kami via WhatsApp untuk ambil promo paket hemat sekarang juga!`
   },
 
   // 19. EDUKASI: Jeda 7-10 Hari Pasca Herbisida
@@ -401,7 +401,7 @@ PENTING: Murni edukasi, tanpa jualan produk.`
     categoryLabel: 'GARANSI COD',
     categoryColor: 'green',
     headlineHtml: 'Bisa Bayar di Tempat (COD)! <span class="headline-highlight">Aman Sampai Pelosok Kebun Se-Indonesia</span>',
-    summaryText: 'Paket Kombo Rp 395.000 untuk 2 Hektar. Kurir antar sampai rumah/kebun, baru bayar.',
+    summaryText: 'Paket Kombo Lengkap untuk 2 Hektar. Kurir antar sampai rumah/kebun, baru bayar.',
     topic: 'Layanan Pengiriman COD Terpercaya Solusi Sawit Nusantara ke Seluruh Indonesia',
     instructions: `Tulis penawaran rasa aman dan garansi (maksimal 90-120 kata):
 - Hook: Takut belanja online barang tidak sampai atau barang palsu? Di Solusi Sawit Nusantara, Anda 100% AMAN!
@@ -409,8 +409,8 @@ PENTING: Murni edukasi, tanpa jualan produk.`
   1. Sistem COD Resmi: Uang baru Anda serahkan ke kurir saat barang sudah dipegang di tangan Anda.
   2. Jangkauan luas dari Aceh, Riau, Jambi, Sumsel, Kalbar, Kalteng, Kalsel, hingga Sulawesi.
   3. Paket dikemas tebal bubble wrap anti-bocor dan bergaransi kirim ulang jika rusak di jalan.
-- Paket Kombo Rp 395.000 (Pelarut 1Kg + Biang Kocor 1L) untuk 2 Hektar kebun.
-- CTA: Mau pesan tanpa ragu? Tulis 'SAYA MAU COD' sekarang juga!`
+- Paket Kombo Lengkap (Pelarut 1Kg + Biang Kocor 1L) untuk 2 Hektar kebun.
+- CTA: Hubungi kami via WhatsApp atau tulis 'SAYA MAU COD' sekarang juga!`
   },
 
   // 22. EDUKASI: Menggemburkan Tanah Piringan Keras
@@ -464,9 +464,9 @@ PENTING: Murni edukasi, tanpa jualan produk.`
   1. Minggu ke-2 s/d 4: Daun menguning berubah hijau segar berkilau dan pelepah membuka lentur.
   2. Bulan ke-1 s/d 2: Bakal bunga betina mulai aktif bermunculan di ketiak pelepah, menekan bunga jantan.
   3. Bulan ke-3 ke atas: Tandan TBS memadat dan bobot timbangan naik tajam di RAM/PKS.
-- Cuma Rp 395.000 untuk 2 Hektar.
+- Paket Kombo Lengkap untuk 2 Hektar. Promo Terbatas!
 - Garansi COD (Barang Tiba Baru Bayar).
-- CTA: Mau kebun sawit Anda menyusul sukses ini? Ketik 'INFO' atau kirim pesan sekarang!`
+- CTA: Mau kebun sawit Anda menyusul sukses ini? Hubungi kami via WhatsApp sekarang!`
   }
 ];
 
