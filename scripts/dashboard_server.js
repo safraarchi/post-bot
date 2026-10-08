@@ -156,44 +156,68 @@ async function createLocalImage(postData, itemIndex, usedSet = null) {
   // 1. Promo Resmi
   if (pillar.key === 'SOLUSI_PRODUK' || imageTag === 'PRODUK_OFFICIAL') {
     if (isFertipro) {
-      // Untuk Fertipro: Bergantian antara Banner Resmi Fertipro & Kartu Promo Terukur
+      // Sinkronisasi otomatis dari C:\Users\Lenovo\Desktop\yusuf\FERTIPRO\image jika ada
+      const externalFertiproDir = 'C:\\Users\\Lenovo\\Desktop\\yusuf\\FERTIPRO\\image';
       const fertiproDir = path.join(__dirname, '..', 'public', 'images', 'promo', 'fertipro');
-      if (fs.existsSync(fertiproDir) && (itemIndex % 2 === 0)) {
-        const banners = fs.readdirSync(fertiproDir).filter(f => f.match(/\.(jpg|jpeg|png)$/i));
+
+      if (!fs.existsSync(fertiproDir)) {
+        fs.mkdirSync(fertiproDir, { recursive: true });
+      }
+
+      if (fs.existsSync(externalFertiproDir)) {
+        try {
+          const extFiles = fs.readdirSync(externalFertiproDir).filter(f => f.match(/\.(jpg|jpeg|png|webp)$/i));
+          for (const file of extFiles) {
+            const src = path.join(externalFertiproDir, file);
+            const dest = path.join(fertiproDir, file);
+            if (!fs.existsSync(dest) || fs.statSync(src).mtimeMs > fs.statSync(dest).mtimeMs) {
+              fs.copyFileSync(src, dest);
+            }
+          }
+        } catch (e) {
+          console.warn('Gagal sync external fertipro images:', e.message);
+        }
+      }
+
+      if (fs.existsSync(fertiproDir)) {
+        const banners = fs.readdirSync(fertiproDir).filter(f => f.match(/\.(jpg|jpeg|png|webp)$/i));
         if (banners.length > 0) {
-          const chosen = banners[itemIndex % banners.length];
+          // Pemilihan banner cerdas sesuai topik / naskah Fertipro
+          const textContext = `${visualHook || ''} ${visualSummary || ''} ${postData.caption || ''}`.toLowerCase();
+          
+          let chosen = null;
+          // 1. Jika membahas Paket Jumbo 25L / 5 Hektar
+          if (textContext.includes('jumbo') || textContext.includes('25 liter') || textContext.includes('25l') || textContext.includes('5 hektar') || textContext.includes('5 ha')) {
+            const jumboCandidates = banners.filter(b => ['5.jpg', '6.jpg', '7.jpg', '8.jpg'].includes(b.toLowerCase()));
+            if (jumboCandidates.length > 0) {
+              chosen = jumboCandidates[itemIndex % jumboCandidates.length];
+            }
+          }
+          // 2. Jika membahas hemat pupuk / efisiensi
+          else if (textContext.includes('hemat') || textContext.includes('75%') || textContext.includes('biaya')) {
+            const hematCandidates = banners.filter(b => ['3.jpg', '4.jpg', '8.jpg'].includes(b.toLowerCase()));
+            if (hematCandidates.length > 0) {
+              chosen = hematCandidates[itemIndex % hematCandidates.length];
+            }
+          }
+          // 3. Jika membahas tuntas trek / rendemen minyak
+          else if (textContext.includes('tuntas') || textContext.includes('trek') || textContext.includes('rendemen')) {
+            const trekCandidates = banners.filter(b => ['1.jpg', '2.jpg', 'sampul.jpg'].includes(b.toLowerCase()));
+            if (trekCandidates.length > 0) {
+              chosen = trekCandidates[itemIndex % trekCandidates.length];
+            }
+          }
+
+          // Fallback: rotasi dari seluruh koleksi banner resmi Fertipro
+          if (!chosen) {
+            chosen = banners[itemIndex % banners.length];
+          }
+
           return {
             fullPath: path.join(fertiproDir, chosen),
             relUrl: `/images/promo/fertipro/${chosen}`
           };
         }
-      }
-
-      // Render Kartu Promo Dinamis dengan Foto Paket Fertipro Asli
-      const filename = `promo_fertipro_${Date.now()}_${itemIndex}.jpg`;
-      const outPromo = path.join(__dirname, '..', 'public', 'images', filename);
-      const fertiproProductImg = path.join(__dirname, '..', 'public', 'images', 'promo', 'paket_fertipro_transparan.png');
-      try {
-        await renderPromoCard({
-          headlineHtml: visualHook || 'Solusi Pelepah Lentur & Buah Jumbo',
-          summaryText: visualSummary || 'Paket kombo hemat 1 Ha atasi sawit trek & lebatkan TBS.',
-          outputPath: outPromo,
-          productImgPath: fertiproProductImg,
-          badgePromo: '🌿 PAKET KOMBO 1 HEKTAR',
-          badgeCod: '🚚 100% BISA COD',
-          strikePrice: 'Rp 550.000',
-          mainPrice: 'Rp 395.000,-',
-          priceSub: 'Cukup untuk 1 Hektar (±133 Pokok)',
-          pill1: '🛒 1 Kg Humat Pasta + 5L POC',
-          pill2: '📦 Bayar di Tempat (COD)'
-        });
-        return { fullPath: outPromo, relUrl: `/images/${filename}` };
-      } catch (e) {
-        console.error('Error rendering Fertipro promo card:', e.message);
-        return {
-          fullPath: path.join(fertiproDir, '1.jpg'),
-          relUrl: '/images/promo/fertipro/1.jpg'
-        };
       }
     }
 
