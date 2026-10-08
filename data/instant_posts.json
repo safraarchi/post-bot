@@ -14,6 +14,9 @@
     "isImage": false,
     "mediaType": "text",
     "customTopic": "Penyebab daun kuning pada sawit",
+    "status": "DRAFT",
+    "posted": false,
+    "postedAt": null,
     "createdAt": "2026-10-07T08:02:35.190Z"
   },
   {
@@ -31,6 +34,9 @@
     "isImage": true,
     "mediaType": "image_promo",
     "customTopic": "Rahasia pelepah lentur dan atasi buah trek",
+    "status": "DRAFT",
+    "posted": false,
+    "postedAt": null,
     "createdAt": "2026-10-07T07:58:53.882Z"
   }
 ]

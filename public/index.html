@@ -325,9 +325,11 @@
       flex-direction: column;
       position: relative;
     }
-    .post-card.is-scheduled {
-      border-color: #34d399;
-      background: rgba(5,150,105,0.02);
+    .post-card.is-scheduled,
+    .post-card.is-posted {
+      border-color: #10b981;
+      background: rgba(16,185,129,0.03);
+      box-shadow: 0 4px 14px rgba(16,185,129,0.08);
     }
     
     .post-image-container {
@@ -978,8 +980,21 @@
 
       <!-- Riwayat Postingan Instan -->
       <div style="margin-top: 32px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <h3 style="font-size: 15px; font-weight: 800;">📚 Riwayat Konten Instan Terakhir (<span id="instantHistoryCount">0</span>)</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h3 style="font-size: 15px; font-weight: 800;">📚 Riwayat Konten Instan (<span id="instantHistoryCount">0</span>)</h3>
+            <div class="filter-tabs" id="instantFilterTabs">
+              <button class="filter-btn active" id="instantFilterAll" onclick="setInstantFilter('all')">
+                Semua <span class="count-pill" id="instantPillAll">0</span>
+              </button>
+              <button class="filter-btn" id="instantFilterPending" onclick="setInstantFilter('pending')">
+                ⏳ Belum Diposting <span class="count-pill" id="instantPillPending">0</span>
+              </button>
+              <button class="filter-btn" id="instantFilterPosted" onclick="setInstantFilter('posted')">
+                ✅ Sudah Diposting <span class="count-pill" id="instantPillPosted">0</span>
+              </button>
+            </div>
+          </div>
           <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11px;" onclick="clearInstantHistory()">🗑️ Bersihkan Riwayat</button>
         </div>
         <div id="instantHistoryList" class="posts-grid">
@@ -1090,6 +1105,8 @@
     let selectedInstantPillar = 'SOLUSI_PRODUK';
     let selectedInstantMedia = 'image_promo';
     let instantHistoryData = [];
+    let currentInstantFilter = 'all'; // 'all' | 'pending' | 'posted'
+    let currentSpotlightPost = null;
 
     window.addEventListener('DOMContentLoaded', async () => {
       initTheme();
@@ -1291,11 +1308,14 @@
     }
 
     function renderInstantSpotlight(post) {
+      currentSpotlightPost = post;
       const sec = document.getElementById('instantResultSection');
       const wrap = document.getElementById('instantResultCardWrap');
       if (!sec || !wrap) return;
 
       sec.style.display = 'block';
+
+      const isPosted = !!(post.posted || post.status === 'POSTED');
 
       const imageHtml = post.isImage && post.imagePath
         ? `<div class="spotlight-media-box">
@@ -1310,15 +1330,28 @@
              📝 Postingan Teks Murni<br><small style="font-weight: 400; margin-top: 4px; display: block;">Format teks murni untuk reach organik Facebook maksimal</small>
            </div>`;
 
+      const statusBadgeHtml = isPosted
+        ? `<span id="spotlightStatusBadge" class="badge-pill-clean" style="background: #059669; color: white; font-weight: 800;">✅ Sudah Diposting</span>`
+        : `<span id="spotlightStatusBadge" class="badge-pill-clean" style="background: rgba(217, 119, 6, 0.15); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); font-weight: 800;">⏳ Belum Diposting</span>`;
+
+      const markBtnHtml = isPosted
+        ? `<button id="btnSpotlightMark" class="btn" style="background: rgba(5,150,105,0.15); color: #059669; border: 1px solid #059669; padding: 10px 18px; font-size: 13px; font-weight: 800;" onclick="toggleSpotlightPosted('${post.id}')" title="Batalkan tanda sudah diposting">
+             ↩️ Batal Tandai (Sudah Diposting)
+           </button>`
+        : `<button id="btnSpotlightMark" class="btn" style="background: #059669; color: white; padding: 10px 18px; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(5,150,105,0.25);" onclick="toggleSpotlightPosted('${post.id}')" title="Tandai bahwa konten ini sudah Anda posting ke Facebook">
+             ✅ Tandai Sudah Diposting
+           </button>`;
+
       wrap.innerHTML = `
-        <div class="instant-spotlight-card">
+        <div class="instant-spotlight-card ${isPosted ? 'is-posted' : ''}">
           ${imageHtml}
           <div class="spotlight-content-box">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan (Langsung Posting)</span>
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                  <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan</span>
                   <span class="badge-pill-clean">${escapeHtml(post.pillar || 'Solusi')}</span>
+                  ${statusBadgeHtml}
                 </div>
                 <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">📦 ${escapeHtml(post.productName)}</span>
               </div>
@@ -1333,19 +1366,72 @@
             </div>
 
             <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
-              <button class="btn btn-primary" style="padding: 10px 20px; font-size: 13px; flex: 1; justify-content: center;" onclick="copySpotlightCaption()">
-                📋 Salin Caption Facebook
+              <button class="btn btn-primary" style="padding: 10px 18px; font-size: 13px; flex: 1; min-width: 170px; justify-content: center;" onclick="copySpotlightCaption()">
+                📋 Salin Caption
               </button>
-              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="btn" style="background: #1877f2; color: white; padding: 10px 18px; font-size: 13px;">
+              ${markBtnHtml}
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="btn" style="background: #1877f2; color: white; padding: 10px 16px; font-size: 13px;">
                 🌐 Buka Facebook ↗
               </a>
-              <button class="btn btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="executeGenerateInstant()">
+              <button class="btn btn-secondary" style="padding: 10px 14px; font-size: 13px;" onclick="executeGenerateInstant()">
                 🎲 Buat Variasi Lain
               </button>
             </div>
           </div>
         </div>
       `;
+    }
+
+    async function toggleSpotlightPosted(id) {
+      try {
+        const res = await fetch('/api/instant-posts/toggle-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        // Update di array instantHistoryData
+        const item = instantHistoryData.find(p => p.id === id);
+        if (item) {
+          item.status = data.status;
+          item.posted = data.posted;
+          item.postedAt = data.postedAt;
+        }
+
+        // Update di spotlight jika post yang sama sedang aktif
+        if (currentSpotlightPost && currentSpotlightPost.id === id) {
+          currentSpotlightPost.status = data.status;
+          currentSpotlightPost.posted = data.posted;
+          currentSpotlightPost.postedAt = data.postedAt;
+          renderInstantSpotlight(currentSpotlightPost);
+        }
+
+        renderInstantHistory();
+
+        if (data.posted) {
+          showToast('✅ Berhasil ditandai: Sudah Diposting ke Facebook!');
+        } else {
+          showToast('↩️ Tanda dibatalkan: Belum Diposting.');
+        }
+      } catch (e) {
+        showToast('❌ Gagal mengubah tanda: ' + e.message);
+      }
+    }
+
+    function setInstantFilter(filter) {
+      currentInstantFilter = filter;
+      document.querySelectorAll('#instantFilterTabs .filter-btn').forEach(btn => btn.classList.remove('active'));
+      const activeId = {
+        'all': 'instantFilterAll',
+        'pending': 'instantFilterPending',
+        'posted': 'instantFilterPosted'
+      }[filter];
+      if (activeId && document.getElementById(activeId)) {
+        document.getElementById(activeId).classList.add('active');
+      }
+      renderInstantHistory();
     }
 
     function copySpotlightCaption() {
@@ -1376,23 +1462,41 @@
       const countEl = document.getElementById('instantHistoryCount');
       if (!listEl) return;
 
-      if (countEl) countEl.innerText = instantHistoryData.length;
+      const totalCount = instantHistoryData.length;
+      const pendingCount = instantHistoryData.filter(p => !p.posted && p.status !== 'POSTED').length;
+      const postedCount = instantHistoryData.filter(p => p.posted || p.status === 'POSTED').length;
 
-      if (instantHistoryData.length === 0) {
+      if (countEl) countEl.innerText = totalCount;
+      const pillAll = document.getElementById('instantPillAll');
+      const pillPending = document.getElementById('instantPillPending');
+      const pillPosted = document.getElementById('instantPillPosted');
+      if (pillAll) pillAll.innerText = totalCount;
+      if (pillPending) pillPending.innerText = pendingCount;
+      if (pillPosted) pillPosted.innerText = postedCount;
+
+      let filtered = instantHistoryData.filter(item => {
+        const isPosted = !!(item.posted || item.status === 'POSTED');
+        if (currentInstantFilter === 'pending' && isPosted) return false;
+        if (currentInstantFilter === 'posted' && !isPosted) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
         listEl.innerHTML = `
           <div class="empty-box">
             <div style="font-size: 36px; margin-bottom: 8px;">⚡</div>
-            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Belum Ada Riwayat Konten Instan</h3>
-            <p style="font-size: 12.5px; color: var(--text-muted);">Pilih produk & gaya konten di atas, lalu klik <strong>Buat Konten Sekarang</strong>.</p>
+            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Tidak Ada Konten</h3>
+            <p style="font-size: 12.5px; color: var(--text-muted);">${currentInstantFilter === 'posted' ? 'Belum ada konten yang ditandai sudah diposting.' : (currentInstantFilter === 'pending' ? 'Semua konten sudah ditandai diposting!' : 'Pilih produk di atas lalu klik <strong>Buat Konten Sekarang</strong>.')}</p>
           </div>
         `;
         return;
       }
 
       listEl.innerHTML = '';
-      instantHistoryData.forEach(item => {
+      filtered.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'post-card';
+        const isPosted = !!(item.posted || item.status === 'POSTED');
+        card.className = `post-card ${isPosted ? 'is-posted' : ''}`;
 
         const imageHtml = item.isImage && item.imagePath
           ? `<div class="post-image-container">
@@ -1409,7 +1513,12 @@
           ${imageHtml}
           <div class="card-content">
             <div class="card-meta-row">
-              <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan</span>
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <span class="badge-pill-clean" style="background: #059669; color: white;">⚡ Instan</span>
+                <span class="badge-pill-clean" style="${isPosted ? 'background: #059669; color: white;' : 'background: rgba(217,119,6,0.15); color: #d97706; border: 1px solid rgba(217,119,6,0.3);'}">
+                  ${isPosted ? '✅ Sudah Diposting' : '⏳ Belum Diposting'}
+                </span>
+              </div>
               <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">🕒 ${timeStr}</span>
             </div>
 
@@ -1424,11 +1533,16 @@
               Lihat Selengkapnya ▾
             </button>
 
-            <div class="card-footer">
-              <button class="btn-action btn-action-primary" onclick="copyInstantHistoryCaption('${item.id}')" title="Salin Caption">
-                📋 Salin Caption
-              </button>
-              <div style="display: flex; gap: 4px;">
+            <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button class="btn-action btn-action-primary" onclick="copyInstantHistoryCaption('${item.id}')" title="Salin Caption">
+                  📋 Salin
+                </button>
+                <button class="btn-action" style="${isPosted ? 'background: rgba(5,150,105,0.15); color: #059669; font-weight: 800; border-color: #059669;' : 'background: var(--bg); color: var(--text-main); font-weight: 700;'}" onclick="toggleSpotlightPosted('${item.id}')" title="${isPosted ? 'Klik untuk batalkan tanda' : 'Klik untuk tandai sudah diposting'}">
+                  ${isPosted ? '✅ Diposting' : '🔘 Tandai'}
+                </button>
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
                 ${item.isImage && item.imagePath ? `
                   <a href="${item.imagePath}" download="foto_${item.id}.jpg" class="btn-action" title="Unduh foto">
                     💾 Unduh
@@ -1688,8 +1802,8 @@
                 <button class="btn-action" onclick="toggleEditCaption('${item.id}')" title="Edit teks">
                   ✏️
                 </button>
-                <button class="btn-action" style="${isScheduled ? 'color: #059669;' : ''}" onclick="togglePostScheduled('${item.id}')" title="Tandai status">
-                  ${isScheduled ? '↩️' : '✅'}
+                <button class="btn-action" style="${isScheduled ? 'background: rgba(5,150,105,0.15); color: #059669; font-weight: 800; border-color: #059669;' : 'color: var(--text-muted);'}" onclick="togglePostScheduled('${item.id}')" title="${isScheduled ? 'Batalkan tanda' : 'Tandai sudah dijadwalkan / diposting'}">
+                  ${isScheduled ? '✅ Terjadwal' : '🔘 Tandai'}
                 </button>
                 <button class="btn-action" style="color: var(--danger);" onclick="deleteSinglePost('${item.id}')" title="Hapus">
                   🗑️

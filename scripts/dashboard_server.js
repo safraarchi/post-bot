@@ -81,7 +81,13 @@ function getInstantPosts() {
   }
   try {
     const raw = fs.readFileSync(INSTANT_POSTS_FILE, 'utf8');
-    return JSON.parse(raw || '[]');
+    const posts = JSON.parse(raw || '[]');
+    return posts.map(p => ({
+      ...p,
+      status: p.status || (p.posted ? 'POSTED' : 'DRAFT'),
+      posted: p.posted !== undefined ? p.posted : (p.status === 'POSTED'),
+      postedAt: p.postedAt || null
+    }));
   } catch (e) {
     console.error('Error reading instant_posts.json:', e.message);
     return [];
@@ -809,6 +815,9 @@ const server = http.createServer(async (req, res) => {
           isImage: !!imageRelUrl,
           mediaType: mediaType,
           customTopic: customTopic || null,
+          status: 'DRAFT',
+          posted: false,
+          postedAt: null,
           createdAt: new Date().toISOString()
         };
 
@@ -829,7 +838,55 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 16. API: Hapus Postingan Instan dari Riwayat
+  // 16. API: Toggle Status Mark Postingan Instan (POSTED <-> DRAFT)
+  if (req.method === 'POST' && url.pathname === '/api/instant-posts/toggle-status') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { id, status } = JSON.parse(body || '{}');
+        if (!id) throw new Error('ID postingan diperlukan');
+
+        const posts = getInstantPosts();
+        const item = posts.find(p => p.id === id);
+        if (!item) throw new Error('Postingan instan tidak ditemukan');
+
+        if (status) {
+          item.status = status;
+          item.posted = (status === 'POSTED');
+          item.postedAt = item.posted ? new Date().toISOString() : null;
+        } else {
+          const isCurrentlyPosted = (item.status === 'POSTED' || item.posted === true);
+          if (isCurrentlyPosted) {
+            item.status = 'DRAFT';
+            item.posted = false;
+            item.postedAt = null;
+          } else {
+            item.status = 'POSTED';
+            item.posted = true;
+            item.postedAt = new Date().toISOString();
+          }
+        }
+
+        saveInstantPosts(posts);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          id: item.id,
+          status: item.status,
+          posted: item.posted,
+          postedAt: item.postedAt
+        }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // 17. API: Hapus Postingan Instan dari Riwayat
   if (req.method === 'POST' && url.pathname === '/api/instant-posts/delete') {
     let body = '';
     req.on('data', chunk => body += chunk);
